@@ -1,0 +1,300 @@
+openapi: 3.0.3
+info:
+  title: Swagger film library - OpenAPI 3.0
+  description: API спецификация фильмотеки
+  version: 0.0.1
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Dev server
+  
+paths:
+  /actors:
+    get:
+      summary: Получение списка актёров
+      tags:
+        - Actors
+      operationId:  getAllActors
+      responses:
+        '200':
+          description: Успешный ответ со списком актёров
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Actors"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Добавление актёра
+      tags:
+        - Actors
+      operationId: addActor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Actor"
+      responses:
+        '200':
+          description: Актёр успешно добавлен
+        
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  
+  /actors/{actor_id}:
+    patch:
+      summary: Изменение информации об актёре
+      tags:
+        - Actors
+      operationId: patchActorById
+      parameters:
+        - name: actor_id
+          in: path
+          required: true
+          description: ID актёра
+          schema:
+            type: string
+            format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+      responses:
+        '200':
+          description: Успешное удаление информации об актёре
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    delete:
+      summary: Удаление актёра по ID
+      tags:
+        - Actors
+      operationId: deleteActorByID
+      parameters:
+        - name: actor_id
+          in: path
+          required: true
+          description: ID актёра
+          schema:
+            type: string
+            format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+      responses:
+        '200':
+          description: Успешное удаление информации об актёре
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /movies:
+    get:
+      summary: Получение отсортированного списка фильмов
+      tags:
+        - Movies
+      operationId: getMovies
+      parameters: 
+        - name: sort_by
+          in: query
+          description: Поле сортировки
+          schema:
+            type: string
+            enum:
+              - name
+              - rate
+              - date
+            example: date
+        - name: order
+          in: query
+          description: Порядок сортировки
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            example: desc
+      responses:
+        '200':
+          description: Успешный ответ со списком фильмов
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Movies"
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Добавление нового фильма
+      tags:
+       - Movies
+      operationId: addMovie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Movie"
+      responses:
+        '200':
+          description: Фильм успешно добавлен
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /movies/{movie_id}:
+    patch:
+      summary: Изменение информации о фильме
+      tags:
+        - Movies
+      parameters:
+        - name: movie_id
+          in: path
+          description: ID фильма
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Информация успешно изменена
+        
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    delete:
+      summary: Удаление фильма по ID
+      tags:
+        - Movies
+      parameters:
+        - name: movie_id
+          in: path
+          description: ID фильма
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Фильм успешно удален
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      
+components:
+  schemas:
+    Actor:
+      type: object
+      required:
+        - name
+        - gender
+        - birthday
+      properties:
+        actor_id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        name:
+          type: string
+          example: Leonardo Dicaprio
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+        birthday:
+          type: string
+          format: date
+          example: "1974-10-11"
+        movies:
+          allOf:
+            - $ref: "#/components/schemas/Movies"
+    Actors:
+      type: array
+      items:
+        $ref: "#/components/schemas/Actor"
+    Movie:
+      type: object
+      required: 
+        - name
+        - description
+        - date
+        - rate
+        - actors
+      properties:
+        movie_id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+          example: Django freeman
+        description:
+          type: string
+          maxLength: 1000
+        date:
+          type: string
+          format: date
+          example: "2013-01-17"
+        rate:
+          type: integer
+          minimum: 0
+          maximum: 10
+        actorsIDS:
+          type: array
+          items:
+            type: string
+            format: uuid
+            example: 550e8400-e29b-41d4-a716-446655440000
+    Movies:
+      type: array
+      items:
+        $ref: "#/components/schemas/Movie"
+
+    Error:
+      description: Error
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+      required:
+        - code
+        - message
+        
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+security: 
+  - bearerAuth: []
