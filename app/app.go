@@ -33,8 +33,8 @@ func NewApp() *App {
 		
 	}
 
-	movieRepo := movieRepository.NewMovieRepository(db, logger)
-	actorRepo := actorRepository.NewActorRepository(db, logger)
+	movieRepo := movieRepository.NewMovieRepository(db)
+	actorRepo := actorRepository.NewActorRepository(db)
 
 	service := service.NewService(movieRepo, actorRepo, logger)
 
