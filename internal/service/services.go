@@ -3,12 +3,12 @@ package service
 import (
 	"context"
 	"filmLib/filmlibAPI"
-	"filmLib/internal/domain/movie"
 	"filmLib/internal/domain/actor"
-	"log"
+	"filmLib/internal/domain/movie"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 type MoviesRepository interface {
@@ -29,7 +29,7 @@ type ActorsRepository interface {
 type filmlibService struct {
 	moviesRepo MoviesRepository
 	actorsRepo ActorsRepository
-	logger     *log.Logger
+	logger     *logrus.Logger
 }
 
 func (f *filmlibService) AddActor(ctx context.Context, req *filmlibAPI.Actor) error {
@@ -72,7 +72,7 @@ func (f *filmlibService) NewError(ctx context.Context, err error) *filmlibAPI.Er
 	panic("Implement me!")
 }
 
-func NewService(moviesRepo MoviesRepository, actorsRepo ActorsRepository, l *log.Logger) *filmlibService {
+func NewService(moviesRepo MoviesRepository, actorsRepo ActorsRepository, l *logrus.Logger) *filmlibService {
 	return &filmlibService{
 		moviesRepo: moviesRepo,
 		actorsRepo: actorsRepo,

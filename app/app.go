@@ -10,12 +10,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
+
+	"github.com/sirupsen/logrus"
 )
 
 type App struct {
 	cfg config.Config
-	logger *log.Logger
+	logger *logrus.Logger
 	server *filmlibAPI.Server
 }
 
@@ -24,7 +25,7 @@ func NewApp() *App {
 	if err != nil {
 		log.Fatalf("Can't load config: %s", err)
 	}
-	logger := log.New(os.Stdout, "", 1)
+	logger := logrus.New()
 
 	db, err := dbConnect(cfg)
 	if err != nil {
@@ -57,6 +58,7 @@ func dbConnect(cfg config.Config) (*sql.DB, error) {
 }
 
 func (a *App) ListenAndServe() {
+	log.Printf("Server runs on port: %d", a.cfg.AppPort)
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", a.cfg.DBPort), a.server); err != nil {
 		log.Fatal(err)
 	}
